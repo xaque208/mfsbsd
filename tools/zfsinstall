@@ -402,9 +402,17 @@ if ! /sbin/mount -t devfs devfs ${MNT}/dev; then
 fi
 
 echo -n "Installing PkgNG ..."
-if !  /usr/sbin/chroot ${MNT} /bin/sh -c "portsnap fetch && portsnap extract && make -C /usr/ports/ports-mgmt/pkg && echo 'WITH_PKGNG=yes' >> /etc/make.conf"; then
-  echo " error installing ports-mgmt/pkg"
+if !  /usr/sbin/chroot ${MNT} /bin/sh -c "portsnap fetch && portsnap extract"; then
+  echo " error getting ports"
   exit 1
+else
+  if ! /usr/bin/chroot ${MNT} /bin/sh -c "make -C /usr/ports/ports-mgmt/pkg"
+    echo " error installing ports-mgmt/pkg"
+    exit 1
+  else
+     echo 'WITH_PKGNG=yes' >> ${MNT}/etc/make.conf
+     echo 'PACKAGESITE: http://pkgbeta.freebsd.org/freebsd-9-amd64/latest' > ${MNT}/usr/local/etc/pkg.conf
+  fi
 fi
 
 echo ""
