@@ -401,6 +401,12 @@ if ! /sbin/mount -t devfs devfs ${MNT}/dev; then
 	echo "Error mounting devfs on ${MNT}/dev"
 fi
 
+echo -n "Installing PkgNG ..."
+if !  /usr/sbin/chroot ${MNT} /bin/sh -c "portsnap fetch && portsnap extract && make -C /usr/ports/ports-mgmt/pkg && echo 'WITH_PKGNG=yes' >> /etc/make.conf"; then
+  echo " error installing ports-mgmt/pkg"
+  exit 1
+fi
+
 echo ""
 echo "Installation complete."
 echo "The system will boot from ZFS with clean install on next reboot"
